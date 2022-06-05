@@ -1,0 +1,52 @@
+public class GUIEnv : IObservable<MouseEvent>
+    {
+        private List<IObserver<MouseEvent>> _subscribers;
+
+        public GUIEnv()
+        {
+            _subscribers = new List<IObserver<MouseEvent>>();
+        }
+
+        public void Update()
+        {
+            SplashKit.ProcessEvents();
+
+            if (SplashKit.MouseClicked(MouseButton.LeftButton))
+            {
+                foreach (IObserver<MouseEvent> m in _subscribers)
+                {
+                    m.OnNext(new MouseEvent(MouseButton.LeftButton, SplashKit.MousePosition()));
+                }
+            }
+        }
+
+        public IDisposable Subscribe(IObserver<MouseEvent> newSub)
+        {
+            if (!_subscribers.Contains(newSub))
+            {
+                _subscribers.Add(newSub);
+            }
+
+            return new Unsubscriber(_subscribers, newSub);
+        }
+
+        private class Unsubscriber : IDisposable
+        {
+            private List<IObserver<MouseEvent>> _subscribers;
+            private IObserver<MouseEvent> _subscriber;
+
+            public Unsubscriber(List<IObserver<MouseEvent>> subs, IObserver<MouseEvent> sub)
+            {
+                _subscriber = sub;
+                _subscribers = subs;
+            }
+
+            public void Dispose()
+            {
+                if (_subscribers.Contains(_subscriber))
+                {
+                    _subscribers.Remove(_subscriber);
+                }
+            }
+        }
+    }
