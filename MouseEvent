@@ -1,0 +1,14 @@
+public class MouseEvent
+    {
+        private MouseButton _mouseButton;
+        private Point2D _mousePosition;
+
+        public MouseEvent(MouseButton b, Point2D p)
+        {
+            _mouseButton = b;
+            _mousePosition = p;
+        }
+
+        public MouseButton Button { get => _mouseButton; }
+        public Point2D Position { get => _mousePosition; }
+    }
