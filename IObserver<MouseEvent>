@@ -1,0 +1,79 @@
+public class Button : Widget, IObserver<MouseEvent>
+    {
+        protected IDisposable _unsub;
+
+        public Button(double w, double h, Color c, IObservable<MouseEvent> o) : base(w, h, c)
+        {
+            _unsub = o.Subscribe(this);
+        }
+
+        public virtual void OnClick()
+        {
+            // Placeholder for future implementation
+            // Buttons can end events to subscribers
+        }
+
+        public virtual void OnRelease()
+        {
+            // Placeholder for future implementation
+            // Buttons can end events to subscribers
+        }
+
+        public override void Render()
+        {
+            base.Render();
+
+            if (_state == WidgetStates.Click)
+            {
+                SplashKit.DrawRectangle(Color.Black, _view);
+            }
+        }
+
+        protected override void ChangeState()
+        {
+            switch (_state)
+            {
+                case (WidgetStates.Click):
+                    _state = WidgetStates.Idle;
+                    OnClick();
+                    break;
+                case (WidgetStates.Idle):
+                    _state = WidgetStates.Click;
+                    OnRelease();
+                    break;
+            }
+        }
+
+        protected bool OnMe(Point2D p)
+        {
+            return SplashKit.PointInRectangle(p, _view);
+        }
+
+        public virtual void OnNext(MouseEvent e)
+        {
+            if (OnMe(e.Position))
+            {
+                ChangeState();
+            }
+        }
+
+        public IDisposable Subscribe(IObservable<MouseEvent> e)
+        {
+            return e.Subscribe(this);
+        }
+
+        public void UnSubscribe()
+        {
+            _unsub.Dispose();
+        }
+
+        public virtual void OnCompleted()
+        {
+            UnSubscribe();
+        }
+
+        public virtual void OnError(Exception e)
+        {
+            throw e;
+        }
+    }
